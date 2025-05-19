@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Ergo-no</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="header"></div>
+
+  <main>
+    <section class="about">
+      <h2>About Our Project!</h2>
+      <p>This website was created as part of our WEB programming project where we decided to explore the fascinating world of terrible user experience.</p>
+      
+      <h3>Team Members</h3>
+      <div class="team-members">
+        <div class="member">
+          <h4>Jude Guehl</h4>
+          <p>Chief of Beatiful Misery Officer - Responsible for making the magnificent CSS files.</p>
+        </div>
+        <div class="member">
+          <h4>Raphaël Brun</h4>
+          <p>Head of User Provocation - Created the ever so funny and not provoking text with the HTML file.</p>
+        </div>
+      </div>
+      
+      <h3>Project "Highlights"</h3>
+      <ul>
+        <li>Buttons that sometimes don't work</li>
+        <li>Text that's hard to read on purpose</li>
+        <li>Navigation that makes you feel lost</li>
+        <li>All the frustration with none of the fun!</li>
+      </ul>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header').innerHTML = html;
+      })
+      .catch(err => console.error('Failed to load header:', err));
+
+    // Load footer
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('footer').innerHTML = html;
+      })
+      .catch(err => console.error('Failed to load footer:', err));
+  </script>
+</body>
+</html>
