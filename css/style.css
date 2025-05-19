@@ -9,6 +9,24 @@ header{
     padding: 1em 2em;
 }
 
+header a{
+    text-decoration: none;
+    padding: 0.5em 1em; 
+    color: #000;
+}
+
+#connect{
+    color: #e3e3e3;
+    background-color: #532E60;
+    border-radius: 0.5em;
+}
+
+header a:hover{
+    color: #e3e3e3;
+    background-color: #532E60;
+    border-radius: 0.5em;
+}
+
 body{
     font-family: Arial, sans-serif;
     margin: 0;
