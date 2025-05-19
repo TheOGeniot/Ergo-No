@@ -1,8 +1,12 @@
-#header{
-    background-color: #333;
-    color: white;
-    padding: 10px;
+header{
+    background-color: #EDCEFC;
+    padding: 0;
     text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em 2em;
 }
 
 body{
@@ -14,4 +18,5 @@ body{
 
 footer{
     background-color: #532E60;
+    padding: 1em 2em;
 }
