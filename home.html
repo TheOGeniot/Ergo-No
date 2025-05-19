@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home</title>
+</head>
+<body>
+  <div id="header"></div>
+
+  <main>
+    <h2>Welcome!</h2>
+    <p>This is the homepage.</p>
+  </main>
+
+  <div id="footer"></div>
+
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header').innerHTML = html;
+      });
+
+    // Load footer
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('footer').innerHTML = html;
+      });
+  </script>
+</body>
+</html>
