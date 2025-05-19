@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ergo-no - A Sudoku Game" />
+  <title>Ergo-no - Boring Game</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div id="header"></div>
+
+  <main>
+    <div id="sudoku-board"></div>
+    <div style="margin-top:1em;">
+      <button id="check-sudoku">Check</button>
+      <button id="solve-sudoku">Solve</button>
+      <button id="reset-sudoku">Reset</button>
+      <button id="new-sudoku">New</button>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="../js/sudoku.js"></script>
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header').innerHTML = html;
+      });
+
+    // Load footer
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('footer').innerHTML = html;
+      });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSudokuGame();
+    });
+  </script>
+</body>
+</html>
