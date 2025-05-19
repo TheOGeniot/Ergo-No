@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect - Ergo-no</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #compensation {
+      text-align: center;
+      margin-top: 2rem;
+      display: none;
+    }
+    #gif-container img {
+      max-width: 100%;
+      border: 3px solid #ff0000;
+      margin-top: 1rem;
+    }
+    .disclaimer {
+      background-color: #ffeb3b;
+      padding: 1rem;
+      border-left: 5px solid #ff9800;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+
+  <main>
+    <section class="connect">
+      <h2>Totally Legit Connection Form</h2>
+      
+      <div class="disclaimer">
+        <h3>⚠️ IMPORTANT DISCLAIMER ⚠️</h3>
+        <p>This is obviously a joke form. Please don't enter real personal information! 
+        Feel free to type anything or leave fields empty. This is just for fun!</p>
+      </div>
+      
+      <form id="contact-form">
+        <div class="form-group">
+          <label for="email">Email Address (We'll sell this to 1000+ partners):</label>
+          <input type="email" id="email" name="email" placeholder="not@real.com">
+        </div>
+        
+        <div class="form-group">
+          <label for="photo">Your Photo (For our wall of shame):</label>
+          <input type="file" id="photo" name="photo" accept="image/*">
+        </div>
+        
+        <div class="form-group">
+          <label for="credit-card">Credit Card Info (For "verification" purposes):</label>
+          <input type="text" id="credit-card" name="credit-card" placeholder="1234 5678 9012 3456">
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Full Address (So we can send you junk mail):</label>
+          <textarea id="address" name="address" rows="3" placeholder="123 Fake Street"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="age">Your Age:</label>
+          <input type="number" id="age" name="age" min="1" max="120" placeholder="10000">
+        </div>
+        
+        <div class="form-group">
+          <label for="social">Social Security Number (VERY IMPORTANT):</label>
+          <input type="text" id="social" name="social" placeholder="*I totally won't steal anything">
+        </div>
+                
+        <div class="form-group">
+          <label>
+            Check this box to agree to our terms and conditions (which you won't read):
+            <input type="checkbox" name="terms" required>
+            I agree to surrender all my rights and firstborn child (Required)
+          </label>
+        </div>
+        
+        <button type="submit" id="submit-btn">Submit All Your Data!</button>
+      </form>
+      
+      <div id="compensation">
+        <h3>Thank you for wasting your time!</h3>
+        <p>Here is a gif as compensation for this:</p>
+        <div id="gif-container">
+          <img src="../images/efrei-qualité.gif" alt="Our sincere apologies">
+        </div>
+        <p>Want to <a href="#" id="reset-form">waste more time</a>? Here is a reset button!</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script>
+    // Load header
+    fetch('header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header').innerHTML = html;
+      })
+      .catch(err => console.error('Failed to load header:', err));
+
+    // Load footer
+    fetch('footer.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('footer').innerHTML = html;
+      })
+      .catch(err => console.error('Failed to load footer:', err));
+
+    // Form "functionality"
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Show the compensation message
+      document.getElementById('compensation').style.display = 'block';
+      
+      // Scroll to the compensation message
+      document.getElementById('compensation').scrollIntoView({
+        behavior: 'smooth'
+      });
+      
+      // Play a silly sound if available
+      if (typeof Audio !== 'undefined') {
+        const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
+        audio.play().catch(e => console.log("Couldn't play sound:", e));
+      }
+    });
+
+    // Reset form handler
+    document.getElementById('reset-form').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('contact-form').reset();
+      document.getElementById('compensation').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
