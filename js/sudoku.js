@@ -71,4 +71,45 @@ class Sudoku {
         }
         return true;
     }
+
+    generateRandomPuzzle(clues = 30) {
+        // Fill the board with a complete solution
+        this.board = this.generateEmptyBoard();
+        this._fillDiagonalBoxes();
+        this.solve();
+        // Remove cells to create a puzzle
+        let cellsToRemove = this.size * this.size - clues;
+        while (cellsToRemove > 0) {
+            const row = Math.floor(Math.random() * this.size);
+            const col = Math.floor(Math.random() * this.size);
+            if (this.board[row][col] !== 0) {
+                this.board[row][col] = 0;
+                cellsToRemove--;
+            }
+        }
+    }
+
+    _fillDiagonalBoxes() {
+        for (let i = 0; i < this.size; i += this.boxSize) {
+            this._fillBox(i, i);
+        }
+    }
+
+    _fillBox(row, col) {
+        let nums = [1,2,3,4,5,6,7,8,9];
+        for (let i = 0; i < this.boxSize; i++) {
+            for (let j = 0; j < this.boxSize; j++) {
+                const idx = Math.floor(Math.random() * nums.length);
+                this.board[row + i][col + j] = nums[idx];
+                nums.splice(idx, 1);
+            }
+        }
+    }
+}
+
+// Helper to create a random puzzle (export for use in HTML)
+function generateSudokuPuzzle(clues = 30) {
+    const sudoku = new Sudoku();
+    sudoku.generateRandomPuzzle(clues);
+    return sudoku;
 }
