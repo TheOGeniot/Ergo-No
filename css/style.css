@@ -13,6 +13,7 @@ header a{
     text-decoration: none;
     padding: 0.5em 1em; 
     color: #000;
+    transition: color 0.2s, background 0.2s, transform 0.1s;
 }
 
 #connect{
@@ -25,20 +26,79 @@ header a:hover{
     color: #e3e3e3;
     background-color: #532E60;
     border-radius: 0.5em;
+    transform: scale(1.08) rotate(-2deg);
 }
 
 body{
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #FFF8E7;
+    background: linear-gradient(135deg, #FFF8E7 0%, #EDCEFC 100%);
+    min-height: 100vh;
+}
+
+main {
+    padding: 2em 1em;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+section {
+    background: #fff;
+    border-radius: 1em;
+    box-shadow: 0 4px 24px #532E6022;
+    padding: 2em;
+    margin-bottom: 2em;
+    animation: popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+    80% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+h1, h2, h3, h4 {
+    color: #532E60;
+    margin-top: 0;
+}
+
+.button, button, input[type="submit"] {
+    background: #532E60;
+    color: #e3e3e3;
+    border: none;
+    border-radius: 0.5em;
+    padding: 0.7em 1.5em;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 1px 1px 0 #EDCEFC;
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    outline: none;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.button:hover, button:hover, input[type="submit"]:hover,
+.button:focus, button:focus, input[type="submit"]:focus {
+    background: #EDCEFC;
+    color: #532E60;
+    transform: scale(1.08) rotate(-2deg);
+}
+
+a {
+    color: #532E60;
+    transition: color 0.2s;
+}
+
+a:hover, a:focus {
+    color: #FF00FF;
+    text-decoration: underline;
 }
 
 footer{
     background-color: #532E60;
     padding: 1em 2em;
-}
-footer{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -50,4 +110,100 @@ footer a{
     text-decoration: none;
     padding: 0.5em 1em; 
     color: #e3e3e3;
+    transition: color 0.2s, background 0.2s;
+}
+
+footer a:hover, footer a:focus {
+    color: #532E60;
+    background: #e3e3e3;
+    border-radius: 0.5em;
+}
+
+.intro, .about, .connect {
+    animation: popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+}
+
+.game-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2em;
+    justify-content: center;
+    margin-top: 2em;
+}
+
+.game-option {
+    background: #EDCEFC;
+    border-radius: 1em;
+    box-shadow: 0 2px 12px #532E6022;
+    padding: 1.5em 2em;
+    min-width: 220px;
+    max-width: 300px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.game-option:hover {
+    transform: scale(1.04) rotate(-1deg);
+    box-shadow: 0 6px 24px #532E6044;
+}
+
+.team-members {
+    display: flex;
+    gap: 2em;
+    flex-wrap: wrap;
+    margin-top: 1em;
+}
+
+.member {
+    background: #EDCEFC;
+    border-radius: 0.7em;
+    padding: 1em 1.5em;
+    box-shadow: 0 1px 6px #532E6011;
+    min-width: 180px;
+    flex: 1 1 180px;
+}
+
+ul {
+    padding-left: 1.5em;
+}
+
+.disclaimer {
+    background-color: #ffeb3b;
+    padding: 1rem;
+    border-left: 5px solid #ff9800;
+    margin-bottom: 2rem;
+    border-radius: 0.5em;
+    font-weight: bold;
+    color: #532E60;
+    box-shadow: 0 1px 8px #ffeb3b44;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    border: 1px solid #ccc;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    font-size: 1em;
+    margin-top: 0.2em;
+    margin-bottom: 0.5em;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border: 1.5px solid #532E60;
+    box-shadow: 0 0 6px #EDCEFC;
+    outline: none;
+}
+
+#compensation {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+#gif-container img {
+    max-width: 100%;
+    border: 3px solid #ff0000;
+    margin-top: 1rem;
+    border-radius: 0.5em;
 }
