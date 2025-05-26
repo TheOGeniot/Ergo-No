@@ -6,92 +6,71 @@
   <meta name="description" content="Ergo-no - 25x25 Sudoku Game" />
   <title>Ergo-no - 25x25 Sudoku</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <style>
-    .sudoku-table-25 {
-      border-collapse: collapse;
-      margin: 0 auto;
-      background: #fff;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
-    }
-    .sudoku-table-25 td {
-      border: 1px solid #bbb;
-      width: 28px;
-      height: 28px;
-      padding: 0;
-      text-align: center;
-      position: relative;
-    }
-    .sudoku-cell-25 {
-      width: 100%;
-      height: 100%;
-      border: none;
-      text-align: center;
-      font-size: 1em;
-      background: transparent;
-      outline: none;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      color: #333;
-      transition: background 0.2s;
-    }
-    .sudoku-cell-25:focus {
-      background: #e0f7fa;
-    }
-    .sudoku-cell-25.fixed {
-      background: #f0f0f0;
-      color: #888;
-      font-weight: bold;
-    }
-    /* Thicker borders for 5x5 boxes */
-    .sudoku-table-25 td {
-      border-width: 1px;
-    }
-    .sudoku-table-25 tr:nth-child(5n) td {
-      border-bottom: 2.5px solid #333;
-    }
-    .sudoku-table-25 tr td:nth-child(5n) {
-      border-right: 2.5px solid #333;
-    }
-    .sudoku-table-25 tr:first-child td {
-      border-top: 2.5px solid #333;
-    }
-    .sudoku-table-25 tr td:first-child {
-      border-left: 2.5px solid #333;
-    }
-    button#check-sudoku-25, button#solve-sudoku-25, button#reset-sudoku-25, button#new-sudoku-25 {
-      background: #1976d2;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 0.5em 1.2em;
-      margin: 0 0.3em;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    button#check-sudoku-25:hover, button#solve-sudoku-25:hover, button#reset-sudoku-25:hover, button#new-sudoku-25:hover {
-      background: #1565c0;
-    }
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 80vh;
-      justify-content: center;
-    }
-  </style>
 </head>
 <body>
   <div id="header"></div>
   <main>
-    <div id="sudoku-board-25"></div>
+    <div id="loading-bar" style="width:100%;height:8px;background:#eee;position:relative;display:none;margin-bottom:1em;">
+      <div id="loading-progress" style="height:100%;width:0;background:#e74c3c;transition:width 0.3s;"></div>
+    </div>
+    <div id="sudoku-controls" style="display:none;"></div>
+    <div id="sudoku-board"></div>
     <div style="margin-top:1em;">
-      <button id="check-sudoku-25">Check</button>
-      <button id="solve-sudoku-25">Solve</button>
-      <button id="reset-sudoku-25">Reset</button>
-      <button id="new-sudoku-25">New</button>
+      <button id="check-sudoku">Check</button>
+      <button id="solve-sudoku">Solve</button>
+      <button id="reset-sudoku">Reset</button>
+      <button id="new-sudoku">New</button>
     </div>
   </main>
   <div id="footer"></div>
+  <script src="../js/sudoku.js"></script>
+  <script src="../js/script.js"></script>
+  <script>
+    window.nonErgoMode = true;
+    function showLoadingBar() {
+      var bar = document.getElementById('loading-bar');
+      var prog = document.getElementById('loading-progress');
+      bar.style.display = 'block';
+      prog.style.width = '0';
+      setTimeout(function(){ prog.style.width = '80%'; }, 50);
+    }
+    function hideLoadingBar() {
+      var bar = document.getElementById('loading-bar');
+      var prog = document.getElementById('loading-progress');
+      prog.style.width = '100%';
+      setTimeout(function(){ bar.style.display = 'none'; prog.style.width = '0'; }, 400);
+    }
+    function getQuerySize() {
+      var m = window.location.search.match(/size=(\d+)/);
+      return m ? parseInt(m[1]) : 25;
+    }
+    if (typeof initSudokuGame === 'function') {
+      document.addEventListener('DOMContentLoaded', function() {
+        var controls = document.getElementById('sudoku-controls');
+        controls.innerHTML = '';
+        var sizeSelect = document.createElement('select');
+        sizeSelect.id = 'sudoku-size';
+        var opt = document.createElement('option');
+        var size = getQuerySize();
+        opt.value = size;
+        opt.textContent = size + ' x ' + size;
+        opt.selected = true;
+        sizeSelect.appendChild(opt);
+        controls.appendChild(sizeSelect);
+        controls.style.display = 'none';
+        // Patch initSudokuGame to show/hide loading bar for large boards
+        var origInit = window.initSudokuGame;
+        window.initSudokuGame = function() {
+          if (parseInt(sizeSelect.value) >= 16) showLoadingBar();
+          setTimeout(function() {
+            origInit();
+            if (parseInt(sizeSelect.value) >= 16) hideLoadingBar();
+          }, parseInt(sizeSelect.value) >= 16 ? 100 : 0);
+        };
+        initSudokuGame();
+      });
+    }
+  </script>
   <script>
     // Load header
     fetch('header.html')
@@ -99,189 +78,13 @@
       .then(html => {
         document.getElementById('header').innerHTML = html;
       });
+
     // Load footer
     fetch('footer.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('footer').innerHTML = html;
       });
-
-    // 25x25 Sudoku logic
-    class Sudoku25 {
-      constructor(board = null) {
-        this.size = 25;
-        this.boxSize = 5;
-        this.board = board ? this.copyBoard(board) : this.generateEmptyBoard();
-      }
-      generateEmptyBoard() {
-        return Array.from({ length: this.size }, () => Array(this.size).fill(0));
-      }
-      copyBoard(board) {
-        return board.map(row => row.slice());
-      }
-      isValid(row, col, num) {
-        for (let i = 0; i < this.size; i++) {
-          if (this.board[row][i] === num || this.board[i][col] === num) {
-            return false;
-          }
-        }
-        const boxRow = Math.floor(row / this.boxSize) * this.boxSize;
-        const boxCol = Math.floor(col / this.boxSize) * this.boxSize;
-        for (let i = 0; i < this.boxSize; i++) {
-          for (let j = 0; j < this.boxSize; j++) {
-            if (this.board[boxRow + i][boxCol + j] === num) {
-              return false;
-            }
-          }
-        }
-        return true;
-      }
-      setCell(row, col, num) {
-        if (num < 0 || num > 25) return false;
-        if (num === 0 || this.isValid(row, col, num)) {
-          this.board[row][col] = num;
-          return true;
-        }
-        return false;
-      }
-      getCell(row, col) {
-        return this.board[row][col];
-      }
-      isComplete() {
-        for (let row = 0; row < this.size; row++) {
-          for (let col = 0; col < this.size; col++) {
-            if (this.board[row][col] === 0) return false;
-          }
-        }
-        return true;
-      }
-      // Simple backtracking solver (for validation or puzzle generation)
-      solve() {
-        for (let row = 0; row < this.size; row++) {
-          for (let col = 0; col < this.size; col++) {
-            if (this.board[row][col] === 0) {
-              for (let num = 1; num <= 25; num++) {
-                if (this.isValid(row, col, num)) {
-                  this.board[row][col] = num;
-                  if (this.solve()) return true;
-                  this.board[row][col] = 0;
-                }
-              }
-              return false;
-            }
-          }
-        }
-        return true;
-      }
-    }
-
-    function renderBoard25() {
-      const boardDiv = document.getElementById('sudoku-board-25');
-      boardDiv.innerHTML = '';
-      const table = document.createElement('table');
-      table.className = 'sudoku-table-25';
-      for (let row = 0; row < 25; row++) {
-        const tr = document.createElement('tr');
-        for (let col = 0; col < 25; col++) {
-          const td = document.createElement('td');
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.maxLength = 2;
-          let val = sudoku25.getCell(row, col);
-          input.value = val === 0 ? '' : val;
-          input.className = 'sudoku-cell-25';
-          if (initialBoard25[row][col] !== 0) {
-            input.disabled = true;
-            input.classList.add('fixed');
-          } else {
-            input.addEventListener('input', (e) => {
-              let v = parseInt(e.target.value);
-              if (isNaN(v) || v < 1 || v > 25) {
-                e.target.value = '';
-                sudoku25.setCell(row, col, 0);
-              } else {
-                sudoku25.setCell(row, col, v);
-              }
-            });
-          }
-          td.appendChild(input);
-          tr.appendChild(td);
-        }
-        table.appendChild(tr);
-      }
-      boardDiv.appendChild(table);
-    }
-
-    // Generate a full valid 25x25 board (for demo, this is slow and not practical for real use)
-    function generateFullBoard25() {
-      let board = Array.from({ length: 25 }, () => Array(25).fill(0));
-      let sudoku = new Sudoku25(board);
-      sudoku.solve();
-      return sudoku.copyBoard(sudoku.board);
-    }
-
-    // Generate a random, doable 25x25 puzzle quickly using a pre-made database
-    function getSample25x25Puzzle() {
-      // This is a valid, minimal 25x25 Sudoku puzzle (0 = empty)
-      // For demo, only one puzzle is provided. Add more for variety.
-      // This puzzle is from a known valid 25x25 Sudoku source.
-      return [
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-      ];
-    }
-
-    function resetBoard25() {
-      sudoku25 = new Sudoku25(initialBoard25);
-      renderBoard25();
-    }
-
-    // Initialize 25x25 Sudoku
-    let initialBoard25 = getSample25x25Puzzle();
-    let sudoku25 = new Sudoku25(initialBoard25);
-    renderBoard25();
-    document.getElementById('check-sudoku-25').onclick = () => {
-      if (sudoku25.isComplete() && sudoku25.solve()) {
-        alert('Congratulations! Sudoku is solved!');
-      } else {
-        alert('There are mistakes or the puzzle is incomplete.');
-      }
-    };
-    document.getElementById('solve-sudoku-25').onclick = () => {
-      sudoku25.solve();
-      renderBoard25();
-    };
-    document.getElementById('reset-sudoku-25').onclick = resetBoard25;
-    document.getElementById('new-sudoku-25').onclick = () => {
-      initialBoard25 = getSample25x25Puzzle();
-      sudoku25 = new Sudoku25(initialBoard25);
-      renderBoard25();
-    };
   </script>
 </body>
 </html>
