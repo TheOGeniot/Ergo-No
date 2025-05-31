@@ -11,7 +11,9 @@
   <div id="header"></div>
 
   <main>
-    <div id="sudoku-board"></div>
+    <div id="sudoku-board">
+      <div style="text-align:center;padding:2em;font-size:1.2em;">Generating Sudoku board, please wait...</div>
+    </div>
     <div style="margin-top:1em;">
       <button id="check-sudoku">Check</button>
       <button id="solve-sudoku">Solve</button>
@@ -22,8 +24,9 @@
 
   <div id="footer"></div>
 
-  <script src="../js/script.js"></script>
+
   <script src="../js/sudoku.js"></script>
+  <script src="../js/script.js"></script>
   <script>
     // Load header
     fetch('header.html')
@@ -40,7 +43,7 @@
       });
 
     document.addEventListener('DOMContentLoaded', () => {
-      initSudokuGame();
+      initSudokuGame(9); // Initialize a 9x9 Sudoku game
     });
   </script>
 </body>

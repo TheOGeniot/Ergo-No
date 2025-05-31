@@ -9,12 +9,22 @@
 </head>
 <body>
   <div id="header"></div>
+
   <main>
-    <div id="loading-bar" style="width:100%;height:8px;background:#eee;position:relative;display:none;margin-bottom:1em;">
-      <div id="loading-progress" style="height:100%;width:0;background:#e74c3c;transition:width 0.3s;"></div>
+    <div id="sudoku-board">
+      <div style="margin-top:2em;">
+        <iframe id="waiting-video" width="320" height="180"
+          src="https://www.youtube.com/embed/fXW-QjBsruE?autoplay=1&loop=1&mute=1&playlist=fXW-QjBsruE"
+          title="Waiting video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+          style="border-radius:8px;box-shadow:0 2px 12px #0002;">
+        </iframe>
+        <div style="font-size:0.9em;color:#888;margin-top:0.5em;">
+          Enjoy this video while you wait!<br>
+          <span style="color:#d32f2f;">You have 5 seconds to unmute if you want audio.</span>
+        </div>
+      </div>
+      <div style="text-align:center;padding:2em;font-size:1.2em;">Generating Sudoku board, please wait...</div>
     </div>
-    <div id="sudoku-controls" style="display:none;"></div>
-    <div id="sudoku-board"></div>
     <div style="margin-top:1em;">
       <button id="check-sudoku">Check</button>
       <button id="solve-sudoku">Solve</button>
@@ -22,55 +32,12 @@
       <button id="new-sudoku">New</button>
     </div>
   </main>
+
   <div id="footer"></div>
+
+
   <script src="../js/sudoku.js"></script>
   <script src="../js/script.js"></script>
-  <script>
-    window.nonErgoMode = true;
-    function showLoadingBar() {
-      var bar = document.getElementById('loading-bar');
-      var prog = document.getElementById('loading-progress');
-      bar.style.display = 'block';
-      prog.style.width = '0';
-      setTimeout(function(){ prog.style.width = '80%'; }, 50);
-    }
-    function hideLoadingBar() {
-      var bar = document.getElementById('loading-bar');
-      var prog = document.getElementById('loading-progress');
-      prog.style.width = '100%';
-      setTimeout(function(){ bar.style.display = 'none'; prog.style.width = '0'; }, 400);
-    }
-    function getQuerySize() {
-      var m = window.location.search.match(/size=(\d+)/);
-      return m ? parseInt(m[1]) : 25;
-    }
-    if (typeof initSudokuGame === 'function') {
-      document.addEventListener('DOMContentLoaded', function() {
-        var controls = document.getElementById('sudoku-controls');
-        controls.innerHTML = '';
-        var sizeSelect = document.createElement('select');
-        sizeSelect.id = 'sudoku-size';
-        var opt = document.createElement('option');
-        var size = getQuerySize();
-        opt.value = size;
-        opt.textContent = size + ' x ' + size;
-        opt.selected = true;
-        sizeSelect.appendChild(opt);
-        controls.appendChild(sizeSelect);
-        controls.style.display = 'none';
-        // Patch initSudokuGame to show/hide loading bar for large boards
-        var origInit = window.initSudokuGame;
-        window.initSudokuGame = function() {
-          if (parseInt(sizeSelect.value) >= 16) showLoadingBar();
-          setTimeout(function() {
-            origInit();
-            if (parseInt(sizeSelect.value) >= 16) hideLoadingBar();
-          }, parseInt(sizeSelect.value) >= 16 ? 100 : 0);
-        };
-        initSudokuGame();
-      });
-    }
-  </script>
   <script>
     // Load header
     fetch('header.html')
@@ -85,6 +52,32 @@
       .then(html => {
         document.getElementById('footer').innerHTML = html;
       });
+
+    // Wait for DOM, then wait for video to play, then load sudoku
+    document.addEventListener('DOMContentLoaded', () => {
+      const iframe = document.getElementById('waiting-video');
+      let loaded = false;
+      if (iframe) {
+        // Try to force play by resetting src (works in most browsers for autoplay/mute)
+        iframe.src = iframe.src; // force reload
+        iframe.addEventListener('load', () => {
+          setTimeout(() => {
+            if (!loaded) {
+              loaded = true;
+              initSudokuGame(25);
+            }
+          }, 5000); // Wait 5 seconds for user to unmute
+        });
+        setTimeout(() => {
+          if (!loaded) {
+            loaded = true;
+            initSudokuGame(25);
+          }
+        }, 7000); // Fallback after 7 seconds
+      } else {
+        initSudokuGame(25);
+      }
+    });
   </script>
 </body>
 </html>

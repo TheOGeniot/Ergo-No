@@ -1,160 +1,261 @@
-// UI and game logic for browser
-function initSudokuGame() {
-    let sudoku;
-    let initialBoard;
-    let size = 9;
-
-    // Remove size selector
-
-    function getSelectedSize() {
-        return 9;
-    }
-
-    // Render the Sudoku board as an HTML table with input fields
-    function renderBoard() {
-        const boardDiv = document.getElementById('sudoku-board');
-        boardDiv.innerHTML = '';
-        const table = document.createElement('table');
-        table.className = 'sudoku-table';
-        for (let row = 0; row < size; row++) {
-            const tr = document.createElement('tr');
-            for (let col = 0; col < size; col++) {
-                const td = document.createElement('td');
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.maxLength = 2;
-                input.value = sudoku.getCell(row, col) || '';
-                input.className = 'sudoku-cell';
-                if (initialBoard[row][col] !== 0) {
-                    input.disabled = true;
-                    input.classList.add('fixed');
-                } else {
-                    input.addEventListener('input', (e) => {
-                        let val = parseInt(e.target.value);
-                        if (isNaN(val) || val < 1 || val > size) {
-                            e.target.value = '';
-                            sudoku.setCell(row, col, 0);
-                        } else {
-                            sudoku.setCell(row, col, val);
-                        }
-                    });
-                }
-                td.appendChild(input);
-                tr.appendChild(td);
-            }
-            table.appendChild(tr);
-        }
-        boardDiv.appendChild(table);
-    }
-
-    // Return a sample puzzle (0 = empty cell)
-    function generatePuzzle() {
-        // For demo: only 9x9 has a real puzzle, others are empty
-        if (size === 9) {
-            return [
-                [5,3,0,0,7,0,0,0,0],
-                [6,0,0,1,9,5,0,0,0],
-                [0,9,8,0,0,0,0,6,0],
-                [8,0,0,0,6,0,0,0,3],
-                [4,0,0,8,0,3,0,0,1],
-                [7,0,0,0,2,0,0,0,6],
-                [0,6,0,0,0,0,2,8,0],
-                [0,0,0,4,1,9,0,0,5],
-                [0,0,0,0,8,0,0,7,9]
-            ];
-        } else {
-            return Array.from({ length: size }, () => Array(size).fill(0));
-        }
-    }
-
-    // Generate a random, solvable Sudoku puzzle
-    function generateRandomPuzzle() {
-        // For demo: only 9x9 random puzzle, others are empty
-        if (size === 9) {
-            let board = Array.from({ length: 9 }, () => Array(9).fill(0));
-            let sudoku = new Sudoku(board, 9);
-            sudoku.solve();
-            let fullBoard = sudoku.copyBoard(sudoku.board);
-            let attempts = 40;
-            while (attempts > 0) {
-                let row = Math.floor(Math.random() * 9);
-                let col = Math.floor(Math.random() * 9);
-                if (fullBoard[row][col] === 0) continue;
-                let backup = fullBoard[row][col];
-                fullBoard[row][col] = 0;
-                if (!hasUniqueSolution(fullBoard)) {
-                    fullBoard[row][col] = backup;
-                } else {
-                    attempts--;
-                }
-            }
-            return fullBoard;
-        } else {
-            return Array.from({ length: size }, () => Array(size).fill(0));
-        }
-    }
-
-    // Helper: Check if a board has a unique solution
-    function hasUniqueSolution(board) {
-        let count = 0;
-        function solveUnique(bd) {
-            for (let row = 0; row < size; row++) {
-                for (let col = 0; col < size; col++) {
-                    if (bd[row][col] === 0) {
-                        for (let num = 1; num <= size; num++) {
-                            let sudoku = new Sudoku(bd, size);
-                            if (sudoku.isValid(row, col, num)) {
-                                bd[row][col] = num;
-                                solveUnique(bd);
-                                bd[row][col] = 0;
-                            }
-                        }
-                        return;
-                    }
-                }
-            }
-            count++;
-        }
-        let bdCopy = board.map(row => row.slice());
-        solveUnique(bdCopy);
-        return count === 1;
-    }
-
-    // Reset the board to the initial puzzle
-    function resetBoard() {
-        sudoku = new Sudoku(initialBoard, size);
-        renderBoard();
-    }
-
-    // Initialize the game
-    function startGame() {
-        size = 9;
-        initialBoard = generatePuzzle();
-        sudoku = new Sudoku(initialBoard, size);
-        renderBoard();
-    }
-    startGame();
-
-    // Button: Check if the board is solved
-    document.getElementById('check-sudoku').onclick = () => {
-        if (sudoku.isComplete() && sudoku.solve()) {
-            alert('Congratulations! Sudoku is solved!');
-        } else {
-            alert('There are mistakes or the puzzle is incomplete.');
-        }
-    };
-    // Button: Solve the puzzle
-    document.getElementById('solve-sudoku').onclick = () => {
-        sudoku.solve();
-        renderBoard();
-    };
-    // Button: Reset the board
-    document.getElementById('reset-sudoku').onclick = resetBoard;
-    // Button: New Game (generate a random puzzle)
-    document.getElementById('new-sudoku').onclick = () => {
-        size = getSelectedSize();
-        initialBoard = generateRandomPuzzle();
-        sudoku = new Sudoku(initialBoard, size);
-        renderBoard();
-    };
+// Utility to get display character for a given value (1-based)
+function getChar(val) {
+    if (val === 0) return '';
+    if (val <= 9) return val.toString();
+    // For 10+, use letters: 10 -> A, 11 -> B, etc.
+    return String.fromCharCode('A'.charCodeAt(0) + val - 10);
 }
+
+// Utility to parse character input to value
+function parseChar(char) {
+    if (!char) return 0;
+    if (char >= '1' && char <= '9') return parseInt(char, 10);
+    let code = char.toUpperCase().charCodeAt(0);
+    if (code >= 65 && code <= 90) { // 'A'-'Z'
+        return code - 65 + 10;
+    }
+    return 0;
+}
+
+let sudoku;
+
+// Render the board as an HTML table with text inputs
+function renderBoard(highlightErrors = false) {
+    let container = document.getElementById('sudoku-board');
+    if (!container) {
+        return;
+    }
+    container.innerHTML = '';
+    const table = document.createElement('table');
+    table.className = 'sudoku-board-table';
+    const boxSize = Math.floor(Math.sqrt(sudoku.size));
+    for (let row = 0; row < sudoku.size; row++) {
+        const tr = document.createElement('tr');
+        for (let col = 0; col < sudoku.size; col++) {
+            const td = document.createElement('td');
+            td.className = 'sudoku-board-cell';
+            // Add thick border classes for box separation
+            if (col % boxSize === 0) td.classList.add('sudoku-box-border-left');
+            if ((col + 1) % boxSize === 0) td.classList.add('sudoku-box-border-right');
+            if (row % boxSize === 0) td.classList.add('sudoku-box-border-top');
+            if ((row + 1) % boxSize === 0) td.classList.add('sudoku-box-border-bottom');
+            let cellValue = sudoku.getCell(row, col);
+            let cellChar = getChar(cellValue);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 1;
+            input.value = cellChar;
+            input.dataset.row = row;
+            input.dataset.col = col;
+            input.className = 'sudoku-board-input';
+            input.autocomplete = 'off';
+            input.inputMode = 'text';
+            input.oninput = onCellInput;
+            // Highlight errors if needed
+            if (
+                highlightErrors &&
+                input.value &&
+                !sudoku.isValid(row, col, parseChar(input.value))
+            ) {
+                input.classList.add('sudoku-error');
+            }
+            td.appendChild(input);
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+    }
+    container.appendChild(table);
+
+    // Remove message area if present
+    let msg = document.getElementById('sudoku-message');
+    if (msg && msg.parentNode) {
+        msg.parentNode.removeChild(msg);
+    }
+}
+
+// Handle input event for each cell
+function onCellInput(e) {
+    const input = e.target;
+    const row = parseInt(input.dataset.row, 10);
+    const col = parseInt(input.dataset.col, 10);
+    let val = parseChar(input.value);
+    // Only allow valid values or empty
+    if (val < 0 || val > sudoku.size) {
+        input.value = '';
+        sudoku.setCell(row, col, 0);
+        return;
+    }
+    // Try to set cell, if invalid, clear input
+    if (val === 0 || sudoku.setCell(row, col, val)) {
+        input.value = getChar(val);
+    } else {
+        input.value = '';
+        sudoku.setCell(row, col, 0);
+    }
+}
+
+// Remove all loading bar/percentage logic and UI
+
+// Remove: showGeneratingOverlay, hideGeneratingOverlay, and all progress/percent logic
+
+async function initSudokuGame(customSize) {
+    sudoku = await generateSudokuAsync(customSize || 9, null);
+    console.log('Sudoku board generated (init):', sudoku.board);
+    sudoku.lastGeneratedBoard = sudoku.copyBoard(sudoku.board);
+    renderBoard();
+}
+
+async function newSudoku() {
+    sudoku = await generateSudokuAsync(sudoku.size, null);
+    console.log('Sudoku board generated (new):', sudoku.board);
+    sudoku.lastGeneratedBoard = sudoku.copyBoard(sudoku.board);
+    renderBoard();
+}
+
+// Helper to generate a Sudoku puzzle asynchronously (non-blocking UI)
+function generateSudokuAsync(size, progressCb) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const boxSize = Math.floor(Math.sqrt(size));
+            // No progress logic
+            const puzzle = Sudoku.generatePuzzle(size, boxSize, 5, null);
+            const s = new Sudoku(size, puzzle, false);
+            resolve(s);
+        }, 50);
+    });
+}
+
+function checkSudoku() {
+    let hasEmpty = false;
+    for (let row = 0; row < sudoku.size; row++) {
+        for (let col = 0; col < sudoku.size; col++) {
+            const val = sudoku.getCell(row, col);
+            if (val === 0) {
+                hasEmpty = true;
+            }
+        }
+    }
+    if (hasEmpty) {
+        alert('There are missing cells.');
+        renderBoard(true);
+        return;
+    }
+    // Use solvedBoard for correctness check
+    if (!sudoku.solvedBoard) {
+        alert('The solution is not ready yet. Please wait and try again.');
+        return;
+    }
+    let hasWrong = false;
+    for (let row = 0; row < sudoku.size; row++) {
+        for (let col = 0; col < sudoku.size; col++) {
+            const val = sudoku.getCell(row, col);
+            if (val !== sudoku.solvedBoard[row][col]) {
+                hasWrong = true;
+            }
+        }
+    }
+    renderBoard(true);
+    if (hasWrong) {
+        alert('There are wrong answers.');
+    } else {
+        alert('Congratulations! The board is correct.');
+    }
+}
+
+function resetSudoku() {
+    // Only reset if lastGeneratedBoard exists and is valid
+    if (sudoku.lastGeneratedBoard && Array.isArray(sudoku.lastGeneratedBoard) && sudoku.lastGeneratedBoard.length === sudoku.size) {
+        sudoku = new Sudoku(sudoku.size, sudoku.copyBoard(sudoku.lastGeneratedBoard), false);
+        // Do NOT update lastGeneratedBoard here!
+        renderBoard();
+    }
+}
+
+function solveSudoku() {
+    if (sudoku.solvedBoard) {
+        if (!sudoku.solvedBoard || !Array.isArray(sudoku.solvedBoard) || !sudoku.solvedBoard.every(row => row.every(cell => cell !== 0))) {
+            alert('This puzzle is unsolvable.');
+            return;
+        }
+        // Only fill the board with the solution if not already solved
+        let alreadySolved = true;
+        for (let row = 0; row < sudoku.size; row++) {
+            for (let col = 0; col < sudoku.size; col++) {
+                if (sudoku.getCell(row, col) !== sudoku.solvedBoard[row][col]) {
+                    alreadySolved = false;
+                    break;
+                }
+            }
+            if (!alreadySolved) break;
+        }
+        if (!alreadySolved) {
+            sudoku.board = sudoku.copyBoard(sudoku.solvedBoard);
+            renderBoard();
+        }
+        // If already solved, do nothing
+        return;
+    }
+    // If not solved yet, compute solution synchronously and render
+    sudoku.solvedBoard = sudoku.getSolution();
+    if (sudoku.solvedBoard && sudoku.solvedBoard.every(row => row.every(cell => cell !== 0))) {
+        sudoku.board = sudoku.copyBoard(sudoku.solvedBoard);
+        renderBoard();
+    } else {
+        alert('This puzzle is unsolvable.');
+    }
+}
+
+// Attach button events after DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    const checkBtn = document.getElementById('check-sudoku');
+    const solveBtn = document.getElementById('solve-sudoku');
+    const resetBtn = document.getElementById('reset-sudoku');
+    const newBtn = document.getElementById('new-sudoku');
+    if (checkBtn) checkBtn.onclick = checkSudoku;
+    if (solveBtn) solveBtn.onclick = solveSudoku;
+    if (resetBtn) resetBtn.onclick = resetSudoku;
+    if (newBtn) newBtn.onclick = newSudoku;
+    // Add Show Steps button if not present
+    let showStepsBtn = document.getElementById('show-steps-sudoku');
+    if (!showStepsBtn) {
+        showStepsBtn = document.createElement('button');
+        showStepsBtn.id = 'show-steps-sudoku';
+        showStepsBtn.textContent = 'Show Steps';
+        const btnContainer = document.querySelector('#sudoku-board').parentNode.querySelector('div');
+        if (btnContainer) btnContainer.appendChild(showStepsBtn);
+    }
+});
+
+// Modular styles for sudoku board
+const style = document.createElement('style');
+style.textContent = `
+#sudoku-board .sudoku-board-table { border-collapse: collapse; margin: 0 auto; }
+#sudoku-board .sudoku-board-cell {
+    border: 1px solid #888;
+    width: 2em; height: 2em;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 0;
+    box-sizing: border-box;
+}
+#sudoku-board .sudoku-box-border-left { border-left: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-right { border-right: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-top { border-top: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-bottom { border-bottom: 3px solid #222 !important; }
+#sudoku-board .sudoku-board-input {
+    width: 1.8em;
+    height: 1.8em;
+    text-align: center;
+    font-size: 1.2em;
+    border: none;
+    outline: none;
+    background: none;
+}
+#sudoku-board .sudoku-board-input:focus {
+    background: #e0f7fa;
+}
+#sudoku-board .sudoku-error {
+    background: #ffcdd2 !important;
+}
+`;
+document.head.appendChild(style);
