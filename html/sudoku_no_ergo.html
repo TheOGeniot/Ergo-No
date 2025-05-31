@@ -3,98 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudoku (No Ergo) - Ergo-no</title>
+  <meta name="description" content="Ergo-no - 25x25 Sudoku Game" />
+  <title>Ergo-no - 25x25 Sudoku</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/sudoku.css" />
-  <style>
-    /* Bad UI overrides */
-    .sudoku-grid {
-      display: flex !important;
-      flex-wrap: wrap;
-      width: 27em;
-      height: 27em;
-      border: none !important;
-      background: repeating-linear-gradient(45deg, #fff8e7, #edcefc 20px, #fff8e7 40px);
-      box-shadow: none !important;
-      border-radius: 0 !important;
-      margin-bottom: 1.5em;
-      position: relative;
-    }
-    .sudoku-cell {
-      width: 2.5em;
-      height: 2.5em;
-      margin: 0;
-      border: none !important;
-      box-shadow: none !important;
-      outline: none !important;
-      transition: none !important;
-      cursor: pointer;
-      user-select: none;
-      position: absolute;
-      /* Randomized by JS */
-    }
-    .sudoku-controls button {
-      background: #ff00ff !important;
-      color: #fff !important;
-      border-radius: 0 !important;
-      border: 2px dashed #532E60 !important;
-      font-family: 'Comic Sans MS', cursive, sans-serif !important;
-      transform: rotate(-2deg);
-      margin: 0 0.5em;
-    }
-    .sudoku-controls button:hover {
-      background: #532E60 !important;
-      color: #ffeb3b !important;
-      transform: rotate(2deg) scale(1.1);
-    }
-    .sudoku-message {
-      color: #ff0000 !important;
-      background: transparent !important;
-      font-size: 1.4em !important;
-      font-family: 'Courier New', monospace !important;
-      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #ff00ff;
-      border: none !important;
-      box-shadow: none !important;
-      animation: none !important;
-    }
-  </style>
 </head>
 <body>
   <div id="header"></div>
 
   <main>
-    <section class="sudoku-container">
-      <h2>Sudoku (No Ergo) - Enjoy the Game!</h2>
-      <div class="sudoku-grid" id="sudoku-grid">
-        <!-- Sudoku cells will be generated here by your friend -->
+    <div id="sudoku-board">
+      <div style="margin-top:2em;">
+        <iframe id="waiting-video" width="320" height="180"
+          src="https://www.youtube.com/embed/fXW-QjBsruE?autoplay=1&loop=1&mute=1&playlist=fXW-QjBsruE"
+          title="Waiting video" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+          style="border-radius:8px;box-shadow:0 2px 12px #0002;">
+        </iframe>
+        <div style="font-size:0.9em;color:#888;margin-top:0.5em;">
+          Enjoy this video while you wait!<br>
+          <span style="color:#d32f2f;">You have 5 seconds to unmute if you want audio.</span>
+        </div>
       </div>
-      <div class="sudoku-controls">
-        <button id="solve-btn">Solve</button>
-        <button id="reset-btn">Reset</button>
-      </div>
-      <div class="sudoku-message" id="message"></div>
-    </section>
+      <div style="text-align:center;padding:2em;font-size:1.2em;">Generating Sudoku board, please wait...</div>
+    </div>
+    <div style="margin-top:1em;">
+      <button id="check-sudoku">Check</button>
+      <button id="solve-sudoku">Solve</button>
+      <button id="reset-sudoku">Reset</button>
+      <button id="new-sudoku">New</button>
+    </div>
   </main>
 
   <div id="footer"></div>
 
+
+  <script src="../js/sudoku.js"></script>
+  <script src="../js/script.js"></script>
   <script>
     // Load header
     fetch('header.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('header').innerHTML = html;
-      })
-      .catch(err => console.error('Failed to load header:', err));
+      });
 
     // Load footer
     fetch('footer.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('footer').innerHTML = html;
-      })
-      .catch(err => console.error('Failed to load footer:', err));
-    // All sudoku logic removed for your friend to implement
+      });
+
+    // Wait for DOM, then wait for video to play, then load sudoku
+    document.addEventListener('DOMContentLoaded', () => {
+      const iframe = document.getElementById('waiting-video');
+      let loaded = false;
+      if (iframe) {
+        // Try to force play by resetting src (works in most browsers for autoplay/mute)
+        iframe.src = iframe.src; // force reload
+        iframe.addEventListener('load', () => {
+          setTimeout(() => {
+            if (!loaded) {
+              loaded = true;
+              initSudokuGame(25);
+            }
+          }, 5000); // Wait 5 seconds for user to unmute
+        });
+        setTimeout(() => {
+          if (!loaded) {
+            loaded = true;
+            initSudokuGame(25);
+          }
+        }, 7000); // Fallback after 7 seconds
+      } else {
+        initSudokuGame(25);
+      }
+    });
   </script>
 </body>
 </html>

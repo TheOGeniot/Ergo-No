@@ -3,50 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sudoku - Ergo-no</title>
+  <meta name="description" content="Ergo-no - A Sudoku Game" />
+  <title>Ergo-no - Boring Game</title>
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/sudoku.css" />
 </head>
 <body>
   <div id="header"></div>
 
   <main>
-    <section class="sudoku">
-      <h2>Sudoku Game</h2>
-      <div class="sudoku-container">
-        <div class="sudoku-grid" id="sudoku-grid">
-          <!-- Sudoku cells will be generated here by your friend -->
-        </div>
-        
-        <div class="sudoku-controls">
-          <button id="solve-btn">Solve</button>
-          <button id="clear-btn">Clear</button>
-        </div>
-        
-        <div class="sudoku-message" id="sudoku-message" style="display:none;"></div>
-      </div>
-    </section>
+    <div id="sudoku-board">
+      <div style="text-align:center;padding:2em;font-size:1.2em;">Generating Sudoku board, please wait...</div>
+    </div>
+    <div style="margin-top:1em;">
+      <button id="check-sudoku">Check</button>
+      <button id="solve-sudoku">Solve</button>
+      <button id="reset-sudoku">Reset</button>
+      <button id="new-sudoku">New</button>
+    </div>
   </main>
 
   <div id="footer"></div>
 
+
+  <script src="../js/sudoku.js"></script>
+  <script src="../js/script.js"></script>
   <script>
     // Load header
     fetch('header.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('header').innerHTML = html;
-      })
-      .catch(err => console.error('Failed to load header:', err));
+      });
 
     // Load footer
     fetch('footer.html')
       .then(response => response.text())
       .then(html => {
         document.getElementById('footer').innerHTML = html;
-      })
-      .catch(err => console.error('Failed to load footer:', err));
-    // All sudoku logic removed for your friend to implement
+      });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSudokuGame(9); // Initialize a 9x9 Sudoku game
+    });
   </script>
 </body>
 </html>
