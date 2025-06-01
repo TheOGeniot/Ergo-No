@@ -1,46 +1,73 @@
-header{
-    background-color: #EDCEFC;
+/* Reset and base styles */
+html, body {
+    margin: 0;
     padding: 0;
-    text-align: center;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #FFF8E7 0%, #EDCEFC 100%);
+    min-height: 100vh;
+    color: #222;
+}
+
+/* Header */
+header {
+    background-color: #EDCEFC;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: 1em 2em;
+    box-sizing: border-box;
+    border-bottom: 2px solid #d1b3e0;
 }
 
-header a{
-    text-decoration: none;
-    padding: 0.5em 1em; 
-    color: #000;
-    transition: color 0.2s, background 0.2s, transform 0.1s;
-}
-
-#connect{
-    color: #e3e3e3;
-    background-color: #532E60;
-    border-radius: 0.5em;
-}
-
-header a:hover{
-    color: #e3e3e3;
-    background-color: #532E60;
-    border-radius: 0.5em;
-    transform: scale(1.08) rotate(-2deg);
-}
-
-body{
-    font-family: 'Segoe UI', Arial, sans-serif;
+header h1 {
     margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #FFF8E7 0%, #EDCEFC 100%);
-    min-height: 100vh;
+    font-size: 2em;
+    font-weight: bold;
+    letter-spacing: 1px;
 }
 
+header nav {
+    display: flex;
+    gap: 1em;
+}
+
+header a {
+    text-decoration: none;
+    padding: 0.5em 1em;
+    color: #532E60;
+    background: none;
+    border-radius: 0.5em;
+    font-weight: 500;
+    transition: color 0.2s, background 0.2s;
+}
+
+header a.button, header a#connect {
+    background: #532E60;
+    color: #e3e3e3;
+    font-weight: bold;
+}
+
+header a.button:hover, header a.button:focus,
+header a#connect:hover, header a#connect:focus {
+    background: #EDCEFC;
+    color: #532E60;
+}
+
+header a:hover, header a:focus {
+    text-decoration: underline;
+}
+
+/* Main content */
 main {
     padding: 2em 1em;
     max-width: 900px;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 section {
@@ -73,17 +100,15 @@ h1, h2, h3, h4 {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 1px 1px 0 #EDCEFC;
-    transition: background 0.2s, color 0.2s, transform 0.1s;
+    transition: background 0.2s, color 0.2s;
     outline: none;
     text-decoration: none;
     display: inline-block;
 }
 
-.button:hover, button:hover, input[type="submit"]:hover,
-.button:focus, button:focus, input[type="submit"]:focus {
+.button:hover, button:focus, input[type="submit"]:hover, input[type="submit"]:focus, button:hover, button:focus {
     background: #EDCEFC;
     color: #532E60;
-    transform: scale(1.08) rotate(-2deg);
 }
 
 a {
@@ -96,7 +121,8 @@ a:hover, a:focus {
     text-decoration: underline;
 }
 
-footer{
+/* Footer */
+footer {
     background-color: #532E60;
     padding: 1em 2em;
     display: flex;
@@ -104,25 +130,56 @@ footer{
     align-items: center;
     justify-content: space-between;
     color: #e3e3e3;
+    box-sizing: border-box;
+    font-size: 1em;
+    border-top: 2px solid #d1b3e0;
 }
 
-footer a{
-    text-decoration: none;
-    padding: 0.5em 1em; 
+footer a {
+    text-decoration: underline;
     color: #e3e3e3;
-    transition: color 0.2s, background 0.2s;
+    background: none;
+    border: none;
+    border-radius: 0;
+    font-weight: normal;
+    font-size: 1em;
+    margin: 0 0.2em;
+    display: inline;
+    padding: 0;
+    transition: color 0.2s;
 }
 
 footer a:hover, footer a:focus {
-    color: #532E60;
-    background: #e3e3e3;
-    border-radius: 0.5em;
+    color: #ffeb3b;
+    background: none;
+    text-decoration: underline;
+    outline: none;
 }
 
-.intro, .about, .connect {
-    animation: popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+footer .cookie-policy {
+    font-size: 0.75em;
+    color: rgb(83, 46, 62);
+    opacity: 1;
+    margin-left: 1em;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font-weight: normal;
+    cursor: pointer;
+    pointer-events: auto;
 }
 
+/* Center the button row under the sudoku board */
+main > div[style*="margin-top:1em;"] {
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    margin-top: 1em;
+}
+
+/* Game options */
 .game-options {
     display: flex;
     flex-wrap: wrap;
@@ -139,14 +196,15 @@ footer a:hover, footer a:focus {
     min-width: 220px;
     max-width: 300px;
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
 .game-option:hover {
-    transform: scale(1.04) rotate(-1deg);
+    background: #fff8e7;
     box-shadow: 0 6px 24px #532E6044;
 }
 
+/* Team members */
 .team-members {
     display: flex;
     gap: 2em;
@@ -163,10 +221,12 @@ footer a:hover, footer a:focus {
     flex: 1 1 180px;
 }
 
+/* Lists */
 ul {
     padding-left: 1.5em;
 }
 
+/* Disclaimer */
 .disclaimer {
     background-color: #ffeb3b;
     padding: 1rem;
@@ -178,6 +238,7 @@ ul {
     box-shadow: 0 1px 8px #ffeb3b44;
 }
 
+/* Forms */
 .form-group input, .form-group textarea, .form-group select {
     border: 1px solid #ccc;
     border-radius: 0.5em;
@@ -196,14 +257,90 @@ ul {
     outline: none;
 }
 
+/* Compensation */
 #compensation {
     text-align: center;
     margin-top: 2rem;
 }
 
+/* GIF container */
 #gif-container img {
     max-width: 100%;
     border: 3px solid #ff0000;
     margin-top: 1rem;
     border-radius: 0.5em;
+}
+
+/* Sudoku board styles */
+#sudoku-board .sudoku-board-table {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+#sudoku-board .sudoku-board-cell {
+    border: 1px solid #888;
+    width: 2em;
+    height: 2em;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#sudoku-board .sudoku-box-border-left { border-left: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-right { border-right: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-top { border-top: 3px solid #222 !important; }
+#sudoku-board .sudoku-box-border-bottom { border-bottom: 3px solid #222 !important; }
+
+#sudoku-board .sudoku-board-input {
+    width: 1.8em;
+    height: 1.8em;
+    text-align: center;
+    font-size: 1.2em;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+#sudoku-board .sudoku-board-input:focus {
+    background: #e0f7fa;
+}
+
+#sudoku-board .sudoku-error {
+    background: #ffcdd2 !important;
+}
+
+#sudoku-board iframe#waiting-video {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+    main {
+        padding: 1em 0.2em;
+    }
+    section {
+        padding: 1em;
+    }
+    .game-options {
+        flex-direction: column;
+        gap: 1em;
+    }
+    .game-option {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+    }
+    header, footer {
+        flex-direction: column;
+        padding: 1em;
+        gap: 0.5em;
+    }
+    main > div[style*="margin-top:1em;"] {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5em;
+    }
 }

@@ -215,15 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (solveBtn) solveBtn.onclick = solveSudoku;
     if (resetBtn) resetBtn.onclick = resetSudoku;
     if (newBtn) newBtn.onclick = newSudoku;
-    // Add Show Steps button if not present
-    let showStepsBtn = document.getElementById('show-steps-sudoku');
-    if (!showStepsBtn) {
-        showStepsBtn = document.createElement('button');
-        showStepsBtn.id = 'show-steps-sudoku';
-        showStepsBtn.textContent = 'Show Steps';
-        const btnContainer = document.querySelector('#sudoku-board').parentNode.querySelector('div');
-        if (btnContainer) btnContainer.appendChild(showStepsBtn);
-    }
 });
 
 // Modular styles for sudoku board
